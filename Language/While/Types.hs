@@ -1,4 +1,4 @@
-module Types where
+module Language.While.Types where
 
 type Varname = String
 

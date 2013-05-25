@@ -1,10 +1,10 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
-module Parser (loadFile, loadStdin) where
+module Language.While.Parser (loadFile, loadStdin) where
 
 import Control.Applicative ((<$>), (<*))
 import Control.Monad (liftM)
-import Types
+import Language.While.Types
 import Text.Parsec
 import Text.Parsec.Expr
 import Text.Parsec.Indent
