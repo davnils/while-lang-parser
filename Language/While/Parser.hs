@@ -1,4 +1,9 @@
-{-# LANGUAGE NoMonomorphismRestriction #-}
+--------------------------------------------------------------------
+-- |
+-- Module : Language.While.Parser
+--
+-- Provides parsing of while-language code.
+-- Supports reading either a file or stdin, resulting in an AST.
 
 module Language.While.Parser (loadFile, loadStdin) where
 
@@ -28,17 +33,13 @@ parseString errMsg input =
   where
   parseResult = runIndent "" $ runParserT program () "" input
 
--- | Misc functions.
-
 -- | Parse a binary operation.
 binaryOp name fun = Infix body
   where
   body = reservedOp name >> return fun
 
--- | Parse a prefix operation, like negation.
+-- | Parse a prefix operation, e.g. negation.
 prefixOp name fun = Prefix $ reservedOp name >> return fun
-
--- | Structure of a program.
 
 -- | Parse a whole program, as a series of statements.
 program = do
@@ -47,7 +48,7 @@ program = do
   return $ foldr1 Scomp . concat $ st
 
 -- | Parse a single statement followed optionally by another one.
--- | Needs to be done due to while-statement.
+-- | Needs to be done due to the while-statement.
 consecutive = do
   s1 <- statement
   (s1:) <$> option [] (liftM return statement)
@@ -61,15 +62,13 @@ statement
   <|> try stmWhile <* whiteSpace
   <|> parens stmWhile <* whiteSpace
 
--- | Arithmetic expressions.
-
--- Parse an arithmetic atom.
+-- | Parse an arithmetic atom.
 arithmeticAtom
   =   Numeral <$> integer
   <|> Variable <$> identifier
   <|> parens arithmeticExpr
 
--- Table of supported arithmetic operations.
+-- | Table of supported arithmetic operations.
 arithmeticOperation =
   [ [binaryOp "*" Amul AssocLeft]
   , [binaryOp "+" Aadd AssocLeft, binaryOp "-" Asub AssocLeft , binaryOp "/" Adiv AssocLeft ]
@@ -78,15 +77,13 @@ arithmeticOperation =
 -- Parse an arithmetic expression, consisting of parenthesis and supported operators.
 arithmeticExpr = buildExpressionParser arithmeticOperation arithmeticAtom
 
--- | Boolean expressions.
 -- | Since Bexp members operate over different domains,
--- | there is some boxing/unboxing being done with WrapAtom.
-
+--   there is some boxing/unboxing being done with WrapAtom.
 data WrapAtom
   = BexpW Bexp
   | AexpW Aexp
 
--- Parse a boolean atom.
+-- | Parse a boolean atom.
 booleanAtom
   =   (try (symbol "true") >> truthVal Btrue)
   <|> (try (symbol "false") >> truthVal Bfalse)
@@ -94,7 +91,7 @@ booleanAtom
   <|> parens booleanExpr'
   where truthVal = return . BexpW
 
--- Table of supported boolean operations.
+-- | Table of supported boolean operations.
 booleanOperation =
   [ [prefixOp "!" bneg]
   , [binaryOp "=" beq AssocLeft
@@ -107,7 +104,7 @@ booleanOperation =
   bleq (AexpW a1) (AexpW a2) = BexpW $ Bleq a1 a2
   band (BexpW b1) (BexpW b2) = BexpW $ Band b1 b2
 
--- Parse a boolean expression.
+-- | Parse a boolean expression.
 booleanExpr = do
   result <- booleanExpr'
   case result of
@@ -156,8 +153,6 @@ stmTryCatch = do
   symbol "catch"
   s2 <- program
   return $ Stry s1 s2
-
--- Parsec specifics.
 
 identifier = P.identifier whileLexer
 integer = P.integer whileLexer

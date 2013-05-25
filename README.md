@@ -5,3 +5,5 @@ Parser for the While language described in "Semantics with Applications" by Niel
 Extended with integer division and try-catch clauses.
 
 Useful for the laborations in the KTH course DD2457 "Program Semantics and Analysis".
+
+Available on hackage.
