@@ -6,4 +6,4 @@ Extended with integer division and try-catch clauses.
 
 Useful for the laborations in the KTH course DD2457 "Program Semantics and Analysis".
 
-Available on hackage.
+Available on hackage. Written by me and Patrik Berggren.
